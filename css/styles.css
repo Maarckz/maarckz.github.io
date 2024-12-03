@@ -3120,7 +3120,7 @@ textarea.form-control-lg {
   --bs-btn-disabled-border-color: transparent;
   --bs-btn-box-shadow: none;
   --bs-btn-focus-shadow-rgb: 161, 79, 48;
-  text-decoration: underline;
+  text-decoration: none;
 }
 .btn-link:focus-visible {
   color: var(--bs-btn-color);
@@ -7991,11 +7991,11 @@ textarea.form-control-lg {
 }
 
 .text-decoration-underline {
-  text-decoration: underline !important;
+  text-decoration: none !important;
 }
 
 .text-decoration-line-through {
-  text-decoration: line-through !important;
+  text-decoration: none !important;
 }
 
 .text-lowercase {
