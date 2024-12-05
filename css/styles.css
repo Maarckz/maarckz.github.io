@@ -52,7 +52,7 @@
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
   --bs-body-color: #212529;
-  --bs-body-bg: #fff;
+  --bs-body-bg: #e6e6e6;
   --bs-border-width: 1px;
   --bs-border-style: solid;
   --bs-border-color: #dee2e6;
@@ -63,8 +63,8 @@
   --bs-border-radius-xl: 1rem;
   --bs-border-radius-2xl: 2rem;
   --bs-border-radius-pill: 50rem;
-  --bs-link-color: #bd5d38;
-  --bs-link-hover-color: #974a2d;
+  --bs-link-color: #495057;
+  --bs-link-hover-color: #6c757d;
   --bs-code-color: #d63384;
   --bs-highlight-bg: #fff3cd;
 }
@@ -239,6 +239,8 @@ sup {
 a {
   color: var(--bs-link-color);
   text-decoration: none;
+  padding-left: 1rem;
+
 }
 a:hover {
   color: var(--bs-link-hover-color);
@@ -3120,7 +3122,7 @@ textarea.form-control-lg {
   --bs-btn-disabled-border-color: transparent;
   --bs-btn-box-shadow: none;
   --bs-btn-focus-shadow-rgb: 161, 79, 48;
-  text-decoration: none;
+  text-decoration: underline;
 }
 .btn-link:focus-visible {
   color: var(--bs-btn-color);
@@ -7991,11 +7993,11 @@ textarea.form-control-lg {
 }
 
 .text-decoration-underline {
-  text-decoration: none !important;
+  text-decoration: underline !important;
 }
 
 .text-decoration-line-through {
-  text-decoration: none !important;
+  text-decoration: line-through !important;
 }
 
 .text-lowercase {
