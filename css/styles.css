@@ -74,13 +74,9 @@
 
 
 #sideNav {
-  position: relative; /* Garante que a navbar não seja afetada */
   z-index: 1000; /* Mantém a navbar acima do VANTA */
 }
 
-.container-fluid {
-  width: 100%;
-}
 
 *,
 *::before,
