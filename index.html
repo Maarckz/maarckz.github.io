@@ -16,6 +16,35 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
     </head>
+    
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Função para aplicar o efeito Vanta após o carregamento da página
+        if (window.VANTA) {
+            const container = document.querySelector(".container-fluid");
+    
+            // Aplique o efeito Vanta ao container
+            VANTA.WAVES({
+                el: container, // Aplique o efeito ao container
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 100.00,
+                minWidth: 100.00,
+                scale: 1.2,  // Reduz o tamanho do efeito
+                scaleMobile: 1.2, // Reduz o tamanho em dispositivos móveis
+                color: 0xaaaaaa,
+                zoom: 0.6, // Reduz o zoom, deixando as ondas menores
+                waveHeight: 40.00,
+                shininess: 30.00,
+                waveSpeed: 0.3, // Diminui a velocidade da onda para um movimento mais suave
+            });
+    
+            container.style.transformOrigin = "center center"; // Ajusta o ponto de origem da rotação
+        }
+    });
+    </script>
 
 
     <body id="page-top">
@@ -31,25 +60,27 @@
                     <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">Sobre</a></li>
                     <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#experience">Experiência</a></li>
                     <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#education">Formação</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#certification">Certificações</a></li>
                     <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#skills">Skills</a></li>
-                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#ctf">CTFs Write-Ups</a></li>
-                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#playbooks">Playbooks</a></li>
-                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#CyberDefense">CyberDefense</a></li>
+                    <!-- <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#ctf">CTFs Write-Ups</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#playbooks">Playbooks</a></li>-->
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="https://maarckz.github.io/CyberDefense/">CyberDefense</a></li>
                 </ul>
             </div>
 
 
         </nav>
         <!-- Page Content-->
-        <div class="container-fluid p-0">
+
+        <div class="container-fluid p-0" >
             <!-- About-->
             <section class="resume-section" id="about">
-                <div class="resume-section-content">
+                <div class="resume-section-content" >
                     <h1 class="mb-0">
-                        Maarckz
+                        Marcus de Almeida
                     </h1>
                     <div class="subheading mb-5">
-                        | 3ºSG Brazilian Navy | Red Team | Cyber Threat Intel & Hunting | Adversary Emulation | THM Top 1% | SYCP | SYWP |
+                        | Maarckz | 3ºSG Brazilian Navy | Red Team | Cyber Threat Intel & Hunting | Adversary Emulation | THM Top 1% | SYCP | SYWP |
                     </div>
                     <p class="lead mb-5">Sou um profissional dedicado à Offensive Security, com mais de uma década de estudos aprofundados, adquirindo habilidades técnicas, experiência prática e soft skills. Atualmente, integro uma seção de Defesa Cibernética da Marinha do Brasil, onde atuo ativamente na execução de testes de penetração, análise de vulnerabilidades, hardening e simulação de adversários.</p>
                     <p class="lead mb-5">Desde 2018, participo de CTFs (Capture The Flag) e projetos de exploração de vulnerabilidades, com classificação no top 1% da plataforma TryHackMe, mais de 180 salas concluídas e 30 badges conquistados.</p>
@@ -71,7 +102,6 @@
                 </div>
 
             </section>
-            <hr class="m-0" />
             <!-- Experience-->
             <section class="resume-section" id="experience">
                 <div class="resume-section-content">
@@ -83,8 +113,8 @@
                             <h3 class="mb-0">Cyber Security Analist - RedTeam</h3>
                             <div class="subheading mb-3">Marinha do Brasil</div>
                             <p>Sou responsável pela implantação de servidores de ataque, implementação de Inteligência de Ameaças Cibernéticas (CTI) e desenvolvimento de hardenings. Realizo a enumeração de vulnerabilidades críticas e contribuo diretamente com as equipes de TI na correção de falhas, aplicação de patches de segurança, garantindo a robustez e a integridade das infraestruturas de TI.</p>
+                            <span class="text-primary">DEZ2023 - Atualmente</span>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">DEZ2023 - Atualmente</span></div>
                     </div>
 
                     <!-- Experience-->
@@ -93,8 +123,8 @@
                             <h3 class="mb-0">Local Network Administrator</h3>
                             <div class="subheading mb-3">Marinha do Brasil</div>
                             <p>Configuração e manutenção de redes, como roteadores, switches e firewalls, além de garantir a conectividade e segurança da infraestrutura. Realizei o monitoramento de redes com Wireshark, fim identificar inconsistências na rede, e implementar medidas de segurança, como regras de firewall. Também fui responsável pela organização de endereços IP e pela resolução de problemas de conectividade.</p>
+                        <span class="text-primary">DEZ2022 - DEZ2023</span>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">DEZ2022 - DEZ2023</span></div>
                     </div>
 
                     <!-- Experience-->
@@ -103,130 +133,193 @@
                             <h3 class="mb-0">SysAdmin</h3>
                             <div class="subheading mb-3">Marinha do Brasil</div>
                             <p>Minha experiência foi focada na gestão de sistemas operacionais Linux. Fui responsável por instalar, configurar e manter servidores Linux e estações de trabalho, além de automatizar tarefas com scripts. Também gerenciei usuários e permissões e implementei políticas de backup e recuperação de desastres.</p>
+                            <span class="text-primary">DEZ2021 - DEZ2022</span>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">DEZ2021 - DEZ2022</span></div>
                     </div>
             
                 </div>
             </section>
-            <hr class="m-0" />
             <!-- Formação-->
             <section class="resume-section" id="education">
                 <div class="resume-section-content">
                     <h2 class="mb-5">Formação</h2>
-
                     <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Universidade Estácio de Sá</h3>
                             <div class="subheading mb-3">Defesa Cibernética</div>
                             <div>
-                                <li>Programação RAD</li>
-                                <li>Auditoria de Sistemas
-                                <li>Análise de Malwares
-                                <li>Computação Forense
-                                <li>Gerenciamento de Vulnerabilidades
-                                <li>Hardening de Servidores
-                                <li>Inteligência de Ameaças Cibernéticas
-                                <li>Segurança de Aplicações
-                                <li>Segurança de Hosts
-
+                                <ul class="fa-ul mb-0">
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Monitoramento
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Programação RAD                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Auditoria de Sistemas
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Análise de Malwares
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Computação Forense
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Gerenciamento de Vulnerabilidades
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Hardening de Servidores
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Inteligência de Ameaças Cibernéticas
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Segurança de Aplicações
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Segurança de Hosts
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">Concluído em 2024</span></div>
                     </div>
+
 
                     <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Faculdade VINCIT</h3>
                             <div class="subheading mb-3">Threat Intelligence and Hunting</div>
                             <div>
-                                <li>Segurança Defensiva e Resposta a Incidentes
-                                <li>Analista de SOC (Security Operation Center)
-                                <li>Malware Hunting
-                                <li>Estratégias de Segurança Cibernéticas
-                                <li>Engenharia Social e Phishing
-                                <li>Detecção de Intrusão, Configuração de Perímetro e Análise de Logs
-                                <li>Gestão de Segurança da Informação
-                                <li>Gerenciamento de Projeto de Redes de Computadores
-                                <li>Threat Intelligence: Strategic, Tactical, Operational and Technical
-                                <li>Cyber Threat Intelligence: Prevenção e Redução de Ataques
-                            </div>
+                                <ul class="fa-ul mb-0">
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Segurança Defensiva e Resposta a Incidentes
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Analista de SOC2-3 (Security Operation Center)
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Malware Hunting
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Estratégias de Segurança Cibernéticas
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Engenharia Social e Phishing
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Detecção de Intrusão, Configuração de Perímetro e Análise de Logs
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Gestão de Segurança da Informação
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Gerenciamento de Projeto de Redes de Computadores
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Threat Intelligence: Strategic, Tactical, Operational and Technical
+                                    </li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span>
+                                        Cyber Threat Intelligence: Prevenção e Redução de Ataques
+                                    </li>
+                                </div>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">Concluído em 2025</span></div>
                     </div>
-
+                </section>
                     
-                    <hr class="m-0" />
+
+            <!-- Certification-->
+            <section class="resume-section" id="certification">
+                <div class="resume-section-content">
                     <h2 class="mb-5">Certificações</h2>
 
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Foundation Level Threat intelligence Analyst</h3>
+                            <span class="text-primary">NOV2024</span>
                             <p class="subheading mb-3">ArcX - Credencial 92453bbc9146c8fbb9d64d39745580e5b25d9ef7</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">NOV2024</span></div>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Cyber Security</h3>
+                            <span class="text-primary">JUL2024</span>
                             <p class="subheading mb-3">FIAP - Credencial e5a460ceaca81a65lafbf264ae465804</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">JUL2024</span></div>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Pentest Profissional v2021 - SYCP</h3>
+                            <span class="text-primary">NOV2021</span>
                             <p class="subheading mb-3">SOLYD Offensive Security - Credencial FB5VZUJiV2</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">NOV2021</span></div>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Pro-Security</h3>
+                            <span class="text-primary">SET2022</span>
                             <p class="subheading mb-3">TryHackMe - Credencial THM-DYPNREOMPX</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">SET2022</span></div>
                     </div>
                     
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">WiFi Hacking Enterprise 2.0</h3>
+                            <span class="text-primary">JUL2023</span>
                             <p class="subheading mb-3">DESEC Security - Credencial bc9146c8fbb9d648fb</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">JUL2023</span></div>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Information Security Analysis and Management</h3>
+                            <span class="text-primary">FEV2024</span>
                             <p class="subheading mb-3">UNESA - Credencial c6a2c21a4d8435e4bed5754</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">FEV2024</span></div>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Certified Cloud Security Professional</h3>
+                            <span class="text-primary">FEV2024</span>
                             <p class="subheading mb-3">UNESA - Credencial 581ad12e0a0285878a549b4</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">FEV2024</span></div>
                     </div>
                     
                     <div class="d-flex flex-column flex-md-row justify-content-between">
                         <div class="flex-grow-1">
                             <h3 class="mb-0">Hacking e Pentest 2.0</h3>
+                            <span class="text-primary">AGO2020</span>
                             <p class="subheading mb-3">SOLYD Offensive Security - Credencial RdMqX8Ur0d e cLq7TEOnT4</p>
                         </div>
-                        <div class="flex-shrink-0"><span class="text-primary">AGO2020</span></div>
                     </div>
+                    
                 </div>
             </section>
 
 
-            <hr class="m-0" />
+
             <!-- Skills-->
             <section class="resume-section" id="skills">
                 <div class="resume-section-content">
@@ -275,84 +368,39 @@
                     <ul class="fa-ul mb-0">
                         <li>
                             <span class="fa-li"><i class="fas fa-check"></i></span>
-                            Coleta de Dados (OSINT)
+                            OSINT - Maltego, GData, Deep & Dark Web
                         </li>
                         <li>
                             <span class="fa-li"><i class="fas fa-check"></i></span>
-                            Análise e Correlacionamento (MITRE ATT&CK)
+                            IDS - Suricata
                         </li>
                         <li>
                             <span class="fa-li"><i class="fas fa-check"></i></span>
-                            Produção de Inteligência
+                            TManager - The Hive + Cortex (MISP)
                         </li>
                         <li>
                             <span class="fa-li"><i class="fas fa-check"></i></span>
-                            Disseminação e Ação
+                            SIEM - WazuH
                         </li>
                         <li>
                             <span class="fa-li"><i class="fas fa-check"></i></span>
-                            Monitoramento
+                            Framework - MITRE ATT&CK
                         </li>
                     </ul>
                 </div>
                 </div>
 
-               
+                
                 
             </section>
 
 
-            <hr class="m-0" />
-            <!-- CTFs Write-Ups-->
-            <section class="resume-section" id="ctf">
-                <div class="resume-section-content">
-                    <h2 class="mb-5">CTFs Write-Ups</h2>
-                    <ul class="fa-ul mb-0">
-                        <li>
-                            <span class="fa-li"><i class="fas fa-trophy text-warning"></i></span>
-                            Em Breve!
-                        </li>
-                    </ul>
-                </div>
-            </section>
-
-
-            <hr class="m-0" />
-            <!-- Playbooks-->
-            <section class="resume-section" id="playbooks">
-                <div class="resume-section-content">
-                    <h2 class="mb-5">Playbooks</h2>
-                    <ul class="fa-ul mb-0">
-                        <li>
-                            <span class="fa-li"><i class="fas fa-trophy text-warning"></i></span>
-                            Em Breve!
-                        </li>
-                    </ul>
-                </div>
-            </section>
-
-            <hr class="m-0" />
-            <!-- CyberDefensePage-->
-            <section class="resume-section" id="CyberDefense">
-                <div class="resume-section-content">
-                    <ul class="fa-ul mb-0">
-                        <li>
-                            <span class="d-none d-lg-block">
-                                <a href="https://maarckz.github.io/CyberDefense/">
-                                  <img class="img-fluid img-profile rounded-circle mx-auto mb-2" 
-                                       src="assets/img/cyberdefense.png" 
-                                       alt="Cyber Defense" />
-                                </a>
-                              </span>
-                              
-                        </li>
-                    </ul>
-                </div>
-            </section>
         </div>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="js/scripts.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
     </body>
 </html>
