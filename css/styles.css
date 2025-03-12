@@ -1234,7 +1234,6 @@ p.lead {
     color: #495057;
     border-radius: 100%;
     font-size: 1.5rem;
-    margin-right: 1.5rem;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
