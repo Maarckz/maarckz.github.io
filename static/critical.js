@@ -66,3 +66,5 @@
         console.log(["", "%c              %c %c      ", "%c                  ", "%c    Marcus de Almeida ", "%c         ", "%c      %c %c             ", ""].join("\n"), u + c(t()), u + "background: none;", u + "background: #888;", u + c(t()), "color: #555; font-size: 20px;", u + c(t()), u + "background: #888;", u + "background: none;", u + c(t()))
     }
 });
+document.addEventListener("contextmenu", event => event.preventDefault());
+document.addEventListener("selectstart", event => event.preventDefault());
