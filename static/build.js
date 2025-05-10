@@ -20662,7 +20662,7 @@
     fd(), gsap.registerPlugin(ScrollToPlugin), gsap.registerPlugin(MotionPathPlugin), gsap.set(window, {
         scrollTo: 0
     }), window.addEventListener("scroll", (function() {
-        (sd = document.documentElement.scrollTop || document.body.scrollTop) < pd[0] ? dd("") : sd < pd[1] ? dd("work") : dd("about")
+        (sd = document.documentElement.scrollTop || document.body.scrollTop) < pd[0] ? dd("") : sd < pd[1] ? dd("") : dd("")
     }), {
         passive: !0
     }), lu ? (window.addEventListener("orientationchange", (function() {
