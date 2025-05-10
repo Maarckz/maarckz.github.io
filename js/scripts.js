@@ -32,5 +32,5 @@ window.addEventListener('DOMContentLoaded', event => {
     });
 
 });
-document.addEventListener("contextmenu", event => event.preventDefault());
-document.addEventListener("selectstart", event => event.preventDefault());
+//document.addEventListener("contextmenu", event => event.preventDefault());
+//document.addEventListener("selectstart", event => event.preventDefault());
