@@ -12,12 +12,17 @@
     border-radius: 100%;
     font-size: 1.5rem;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    text-align: center; /* Ensure text/icon is centered */
+    line-height: 3.5rem; /* Match the height for vertical centering */
 }
 
-.social-icons .social-icon:hover {
-    color: #00ccff;
-    transform: scale(1.1);
+.social-icons:hover .social-icon:hover {
+    color: #969696;
+    transform: scale(1.1) rotate(7deg);
+    transition: all 0.5s ease;
 }
+
+
 
 .dev-icons {
     font-size: 3rem;
@@ -26,8 +31,7 @@
 
 @media screen and (max-width: 767px) {
     .social-icons .social-icon {
-        height: 3rem;
-        width: 3rem;
+        transform: scale(0.8); /* Reduce the size of the icons */
         border-radius: 100%;
         justify-content: center;
         align-items: center;
@@ -393,9 +397,19 @@ a{
 .Title h1,.Title h2{
     font-weight:600
 }
-.Title h1{
-    font-size:64px;
-    margin-bottom:5px
+.Title h1 {
+    font-size: 64px;
+    margin-bottom: 5px;
+    transition: transform 1s ease, color 0.3s ease;
+}
+
+.Title h1:hover {
+    transform: scale(1.03) translateX(10px);
+    background: linear-gradient(75deg, #ff00cc, #00ccff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.5s ease;
+    color: transparent;
 }
 .Title h2{
     font-size:24px;
@@ -404,6 +418,19 @@ a{
     position:relative;
     left:4px
 }
+
+.subtitle {
+    color: #b8b8b8;
+    margin-bottom: 10px;
+    margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+    .subtitle {
+        font-size: 11px;
+    }
+}
+
 @media screen and (max-width:1024px){
     .Title h1{
         font-size:48px
@@ -653,8 +680,20 @@ a{
 .About h3{
     font-size:36px;
     font-weight:600;
+    transition: transform 1s ease, color 0.3s ease;
     margin:0 0 40px
+    
 }
+
+.About h3:hover {
+    transform: scale(1.03) translateX(10px);
+    background: linear-gradient(75deg, #ff00cc, #00ccff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.5s ease;
+    color: transparent;
+}
+
 .About p{
     font-size:20px;
     line-height:25px;
@@ -745,8 +784,21 @@ a{
 .Work h3{
     font-size:50px;
     letter-spacing:4px;
+    transition: transform 1s ease, color 0.3s ease;
     text-transform:uppercase
 }
+
+
+.Work h3:hover {
+    transform: scale(1.03) translateX(20px);
+    background: linear-gradient(75deg, #ff00cc, #00ccff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.5s ease;
+    color: transparent;
+
+}
+
 .Work h3 span{
     height:14px;
     width:50px;
@@ -797,7 +849,17 @@ a{
     font-weight: 600;
     margin: 0 0 40px;
     letter-spacing: 4px;
+    transition: transform 1s ease, color 0.3s ease;
     text-transform: uppercase;
+}
+
+.Experience h3:hover {
+    transform: scale(1.03) translateX(10px);
+    background: linear-gradient(75deg, #ff00cc, #00ccff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.5s ease;
+    color: transparent;
 }
 
 .Experience h3 span {
