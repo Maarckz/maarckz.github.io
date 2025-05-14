@@ -31,7 +31,7 @@
 
 @media screen and (max-width: 767px) {
     .social-icons .social-icon {
-        transform: scale(1);
+        transform: scale(1); /* Reduce the size of the icons */
         border-radius: 100%;
         justify-content: center;
         align-items: center;
@@ -427,7 +427,7 @@ a{
 
 @media (max-width: 768px) {
     .subtitle {
-        font-size: 11px;
+        font-size: 12px;
     }
 }
 
@@ -670,6 +670,7 @@ a{
 .About{
     position:relative;
     height:100vh
+    
 }
 .About-content{
     position:absolute;
@@ -769,7 +770,7 @@ a{
     padding:100px 0
 }
 .Work ul{
-    padding:40px 0 80px
+    padding:0px 0 80px
 }
 .Work ul.Lab-list{
     padding-bottom:0
