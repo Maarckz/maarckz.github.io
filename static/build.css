@@ -427,7 +427,7 @@ a{
 
 @media (max-width: 768px) {
     .subtitle {
-        font-size: 10px;
+        font-size: 11px;
     }
 }
 
@@ -672,21 +672,11 @@ a{
     height:100vh
     
 }
-.About-content {
-    position: absolute;
-    left: 100px;
-    top: 50%;
-    transform: translateX(100%) translateY(-50%);
-    animation: slideInFromRight 0.8s ease forwards;
-}
-
-@keyframes slideInFromRight {
-    from {
-        transform: translateX(100%) translateY(-50%);
-    }
-    to {
-        transform: translateX(0) translateY(-50%);
-    }
+.About-content{
+    position:absolute;
+    left:100px;
+    top:50%;
+    transform:translateY(-50%)
 }
 .About h3{
     font-size:36px;
