@@ -422,7 +422,7 @@ a{
 .subtitle {
     color: #b8b8b8;
     margin-bottom: 10px;
-    margin-left: 5px;
+    margin-left: 0px;
 }
 
 @media (max-width: 768px) {
