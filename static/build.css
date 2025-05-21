@@ -727,6 +727,8 @@ a{
         margin:30px 0;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        width: auto;
+        
     }
 }
 @media screen and (max-width:767px){
