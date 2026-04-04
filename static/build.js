@@ -19458,7 +19458,7 @@
             backLight: 65280,
             room: 2241341,
             text: "#ffffff",
-            voile: "#19252b"
+            voile: "#0d1316"
         }, {
             toneMappingExposure: 10,
             background: 16777215,
