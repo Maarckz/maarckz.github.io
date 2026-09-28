@@ -376,7 +376,7 @@
       sbTrack.classList.add("sb-idle");
     }
   }
-  var REVEAL_SEL = ".Home-content .social-icons, " + ".About-content h3, .About-content p, " + ".Experience-content h3, .Experience-content ul li, " + ".About-content .gg, .Experience-content .gg";
+  var REVEAL_SEL = ".Home-content .social-icons, " + ".Work-content h3, .Work-content ul li, .Work-content .gg, " + ".About-content h3, .About-content p, " + ".Experience-content h3, .Experience-content ul li, " + ".About-content .gg, .Experience-content .gg";
   var rvItems = [];
   function initReveals() {
     var els = document.querySelectorAll(REVEAL_SEL);

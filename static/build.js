@@ -1,4 +1,4 @@
-/*! For license information please see build.js.LICENSE.txt */ ! function (t) {
+! function (t) {
     var e = {};
 
     function n(i) {
@@ -20409,8 +20409,6 @@
             key: "transitionIn",
             value: function () {
                 var t = this;
-                /* v8: delay .45 — a entrada original começa quando o overlay
-                   do boot já está transparente (handoff sem cortar a animação) */
                 this.tl = gsap.timeline({
                     delay: .45
                 });
@@ -20627,7 +20625,6 @@
         return e = o, (n = [{
             key: "transitionIn",
             value: function () {
-                /* v8: delay .45 — handoff com o fim do boot (overlay libera a tela) */
                 this.tl = gsap.timeline({
                     delay: .45
                 }), this.tl.fromTo(this.$el, {

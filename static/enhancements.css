@@ -163,6 +163,25 @@ body::-webkit-scrollbar {
     width: 14px;
 }
 
+@media screen and (max-width: 767px) {
+    #fx-sb {
+        width: 6px;
+    }
+
+    #fx-sb::before {
+        left: 2.5px;
+    }
+
+    #fx-sb-thumb {
+        left: 1.5px;
+        width: 3px;
+    }
+
+    #fx-sb.sb-drag {
+        width: 10px;
+    }
+}
+
 [data-rv] {
     opacity: 0;
     transform: translateX(400px);

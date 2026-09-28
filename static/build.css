@@ -13,9 +13,7 @@
     font-size: 1.5rem;
     transition: background-color 0.3s ease, transform 0.3s ease;
     text-align: center;
-    /* Ensure text/icon is centered */
     line-height: 3.5rem;
-    /* Match the height for vertical centering */
 }
 
 .social-icons:hover .social-icon:hover {
@@ -34,7 +32,6 @@
 @media screen and (max-width: 767px) {
     .social-icons .social-icon {
         transform: scale(1);
-        /* Reduce the size of the icons */
         border-radius: 100%;
         justify-content: center;
         align-items: center;
@@ -234,7 +231,6 @@ screen and (max-width:767px) {
         position: relative;
         overflow: visible;
         padding-bottom: 60px;
-        /* Espaço para o footer */
     }
 }
 
