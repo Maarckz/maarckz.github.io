@@ -19978,7 +19978,7 @@
             var e;
             return function (t, e) {
                 if (!(t instanceof e)) throw new TypeError("Cannot call a class as a function")
-            }(this, o), e = r.call(this, t), lu || (e.onMouseOver = e.onMouseOver.bind(Jh(e)), e.onMouseOut = e.onMouseOut.bind(Jh(e)), e.$el.addEventListener("mouseover", e.onMouseOver), e.$el.addEventListener("mouseout", e.onMouseOut), e.src = "/assets/images/projects/" + e.$el.getAttribute("data-src"), e.isLab = "Lab-list" === e.$el.parentNode.parentNode.getAttribute("class"), e.color = e.$el.getAttribute("data-color") || "#ffffff", e.image = new Image, e.image.src = e.src), e
+            }(this, o), e = r.call(this, t), lu || (e.onMouseOver = e.onMouseOver.bind(Jh(e)), e.onMouseOut = e.onMouseOut.bind(Jh(e)), e.$el.addEventListener("mouseover", e.onMouseOver), e.$el.addEventListener("mouseout", e.onMouseOut), e.ds = e.$el.getAttribute("data-src"), e.src = e.ds && "*" !== e.ds ? "/assets/images/projects/" + e.ds : null, e.isLab = "Lab-list" === e.$el.parentNode.parentNode.getAttribute("class"), e.color = e.$el.getAttribute("data-color") || "#ffffff", e.image = e.src ? new Image : null, e.image && (e.image.src = e.src)), e
         }
         return e = o, (n = [{
             key: "onMouseOver",
@@ -20409,7 +20409,11 @@
             key: "transitionIn",
             value: function () {
                 var t = this;
-                this.tl = gsap.timeline();
+                /* v8: delay .45 — a entrada original começa quando o overlay
+                   do boot já está transparente (handoff sem cortar a animação) */
+                this.tl = gsap.timeline({
+                    delay: .45
+                });
                 var e = 0;
                 this.$all(".gg").forEach((function (n) {
                     var i = [].slice.call(n.querySelectorAll(".gg-symbol"));
@@ -20623,7 +20627,10 @@
         return e = o, (n = [{
             key: "transitionIn",
             value: function () {
-                this.tl = gsap.timeline(), this.tl.fromTo(this.$el, {
+                /* v8: delay .45 — handoff com o fim do boot (overlay libera a tela) */
+                this.tl = gsap.timeline({
+                    delay: .45
+                }), this.tl.fromTo(this.$el, {
                     x: 400,
                     alpha: 0
                 }, {
@@ -20638,7 +20645,7 @@
         Qp = (n(2), Jp = document.body, Kp = i, new o.a(Jp, (function (t) {
             return Kp[t]
         }))),
-        td = new Ph(Qp.$one(".gl")),
+        td = (Ql.emitter.emit("complete"), null),
         ed = Qp.$one(".FakeScroll"),
         nd = Qp.$one(".Container"),
         id = Qp.$one(".Content"),
@@ -20657,7 +20664,7 @@
     }
 
     function fd() {
-        ld = ed.offsetHeight - window.innerHeight, ed.style.height = id.offsetHeight + "px", pd[0] = .5 * rd.offsetHeight, pd[1] = od.offsetTop + od.offsetHeight - .5 * window.innerHeight, ud = window.innerWidth < 768 || window.innerHeight < 600, nd.style.position = ud ? "relative" : "fixed", ud && (id.style.transform = 0), td.resize()
+        ld = ed.offsetHeight - window.innerHeight, ed.style.height = id.offsetHeight + "px", pd[0] = .5 * rd.offsetHeight, pd[1] = od.offsetTop + od.offsetHeight - .5 * window.innerHeight, ud = window.innerWidth < 768 || window.innerHeight < 600, nd.style.position = ud ? "relative" : "fixed", ud && (id.style.transform = 0), td && td.resize()
     }
     fd(), gsap.registerPlugin(ScrollToPlugin), gsap.registerPlugin(MotionPathPlugin), gsap.set(window, {
         scrollTo: 0
@@ -20679,8 +20686,8 @@
     })), bu.on("backin", (function () {
         hd = !1
     })), gsap.ticker.add((function () {
-        lu && td.height !== window.innerHeight + 100 && fd();
+        lu && td && td.height !== window.innerHeight + 100 && fd();
         ad += .1 * (sd - ad), ud || (id.style.transform = "translateY(" + -ad + "px)");
-        td.tl && !hd && (ld <= 0 && fd(), td.tl.progress(ad / ld))
+        td && td.tl && !hd && (ld <= 0 && fd(), td.tl.progress(ad / ld))
     })), gsap.ticker.fps(60)
 }]);
