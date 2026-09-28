@@ -18,121 +18,128 @@
         <link rel="stylesheet" href="static/enhancements.css" />
 
         <style id="mz-boot-crit">
+        .Loader { visibility: hidden !important; }
+        html.fx-lock { overflow: hidden !important; }
 
-.Loader { visibility: hidden !important; }
-html.fx-lock { overflow: hidden !important; }
+        #mz-boot {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: #0d1316;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+        }
 
-#mz-boot {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-    background: #0d1316;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    cursor: pointer;
-    -webkit-user-select: none;
-    user-select: none;
-}
+        #mz-boot.boot-done { pointer-events: none; }
 
-#mz-boot.boot-done { pointer-events: none; }
+        .boot-vig {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 46%, transparent 46%, rgba(4, 7, 9, .55) 100%);
+            pointer-events: none;
+        }
 
-.boot-stage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 24px;
-    padding: 0 24px;
-    will-change: transform, opacity, filter;
-}
+        .boot-stage {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 22px;
+            will-change: transform, opacity, filter;
+        }
 
-.boot-line {
-    width: min(300px, 56vw);
-    height: 2px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, #FFDA7A, #FF6969 35%, #F29FFF 65%, #7C99FF);
-    transform: scaleX(0);
-    will-change: transform;
-}
+        .boot-ggrow {
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(9px);
+            transition: opacity .4s ease, transform .4s ease;
+            will-change: opacity, transform;
+        }
 
-.boot-bars {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    height: 14px;
-}
+        .boot-ggrow.go {
+            opacity: 1;
+            transform: none;
+        }
 
-.boot-bars i {
-    display: block;
-    height: 14px;
-    background: #969696;
-    transform: scaleX(0);
-    transform-origin: 0 50%;
-    will-change: transform;
-}
+        .bs {
+            opacity: 0;
+            transform: translateX(-18px);
+            transition: box-shadow .24s ease;
+            will-change: transform, opacity;
+        }
 
-.boot-bars i.bg1 { background: linear-gradient(90deg, #FFDA7A, #FF6969); }
-.boot-bars i.bg2 { background: linear-gradient(90deg, #F29FFF, #7C99FF); }
-.boot-bars i.bg3 { background: linear-gradient(90deg, #6491D6, #43F0C7); }
-.boot-bars i.bdisc { border-radius: 14px; }
+        .bs.hit {
+            box-shadow: 0 0 16px rgba(255, 255, 255, .5);
+        }
 
-.boot-scan {
-    position: absolute;
-    top: -12px;
-    bottom: -12px;
-    left: 0;
-    width: 2px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, transparent, #fff 28%, #fff 72%, transparent);
-    box-shadow: 0 0 12px rgba(242, 159, 255, .75);
-    opacity: 0;
-    will-change: transform, opacity;
-}
+        .boot-flash {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
 
-@media (max-width: 360px) {
-    .boot-bars { transform: scale(.82); }
-}
+        #mz-boot.boot-out .boot-stage {
+            animation: bootStageOut .43s cubic-bezier(.55, 0, .8, .4) forwards;
+        }
 
-@keyframes mzBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes mzLine { to { transform: scaleX(1); } }
-@keyframes mzScan {
-    0% { left: 0; opacity: 0; }
-    12% { opacity: 1; }
-    88% { opacity: 1; }
-    100% { left: calc(100% - 2px); opacity: 0; }
-}
-@keyframes mzAutoOut {
-    0%, 86% { opacity: 1; }
-    100% { opacity: 0; visibility: hidden; pointer-events: none; }
-}
+        @keyframes bootStageOut {
+            0% { opacity: 1; transform: none; filter: none; }
+            28% { opacity: 1; transform: translate(3px, -2px) skewX(-4deg); filter: blur(1px) contrast(1.5); }
+            58% { opacity: .92; transform: translate(-4px, 2px) skewX(5deg) scale(1.012); filter: blur(2px) contrast(1.3); }
+            100% { opacity: 0; transform: translate(0, -12px) scale(1.04); filter: blur(9px); }
+        }
 
-#mz-boot:not(.mz-live) { animation: mzAutoOut 2.4s ease forwards; }
+        #mz-boot.boot-out .boot-flash {
+            animation: bootFlash .5s ease forwards;
+        }
 
-#mz-boot:not(.mz-live) .boot-bars i { animation: mzBar .45s cubic-bezier(.22, 1, .36, 1) forwards; }
-#mz-boot:not(.mz-live) .boot-bars i:nth-child(1) { animation-delay: 0s; }
-#mz-boot:not(.mz-live) .boot-bars i:nth-child(2) { animation-delay: .07s; }
-#mz-boot:not(.mz-live) .boot-bars i:nth-child(3) { animation-delay: .14s; }
-#mz-boot:not(.mz-live) .boot-bars i:nth-child(4) { animation-delay: .21s; }
-#mz-boot:not(.mz-live) .boot-bars i:nth-child(5) { animation-delay: .28s; }
-#mz-boot:not(.mz-live) .boot-bars i:nth-child(6) { animation-delay: .35s; }
-#mz-boot:not(.mz-live) .boot-bars i:nth-child(7) { animation-delay: .42s; }
+        @keyframes bootFlash {
+            0% { opacity: 0; }
+            12% { opacity: .5; }
+            100% { opacity: 0; }
+        }
 
-#mz-boot:not(.mz-live) .boot-line { animation: mzLine .55s cubic-bezier(.22, 1, .36, 1) .65s forwards; }
-#mz-boot:not(.mz-live) .boot-scan { animation: mzScan 1.5s ease-in-out .12s forwards; }
+        #mz-boot:not(.mz-live) { animation: mzAutoOut 2.6s ease forwards; }
+        #mz-boot:not(.mz-live) .boot-ggrow { animation: bootIn .4s ease .1s forwards; }
+        #mz-boot:not(.mz-live) .bs { animation: bsIn .45s cubic-bezier(.34, 1.56, .64, 1) forwards; }
+        #mz-boot:not(.mz-live) .bs:nth-child(1) { animation-delay: .3s; }
+        #mz-boot:not(.mz-live) .bs:nth-child(2) { animation-delay: .5s; }
+        #mz-boot:not(.mz-live) .bs:nth-child(3) { animation-delay: .7s; }
+        #mz-boot:not(.mz-live) .bs:nth-child(4) { animation-delay: .9s; }
+        #mz-boot:not(.mz-live) .bs:nth-child(5) { animation-delay: 1.1s; }
 
-#mz-boot.mz-live,
-#mz-boot.mz-live .boot-stage * { animation: none !important; }
+        @keyframes bootIn {
+            to { opacity: 1; transform: none; }
+        }
 
-@media (prefers-reduced-motion: reduce) {
-    #mz-boot:not(.mz-live) .boot-bars i,
-    #mz-boot:not(.mz-live) .boot-line,
-    #mz-boot:not(.mz-live) .boot-scan {
-        animation-duration: .01s !important;
-        animation-delay: 0s !important;
-    }
-}
+        @keyframes bsIn {
+            from { opacity: 0; transform: translateX(-18px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        @keyframes mzAutoOut {
+            0%, 86% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; pointer-events: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #mz-boot:not(.mz-live) .boot-ggrow,
+            #mz-boot:not(.mz-live) .bs {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
         </style>
 
 </head>
@@ -140,13 +147,17 @@ html.fx-lock { overflow: hidden !important; }
 <body style="background: #0d1316;">
 
         <div id="mz-boot" aria-hidden="true">
-                <div class="boot-stage">
-                        <div class="boot-line"></div>
-                        <div class="boot-bars">
-                                <i class="bg1" style="width:40px"></i><i class="bgy" style="width:20px"></i><i class="bdisc" style="width:14px"></i><i class="bg2" style="width:72px"></i><i class="bsq" style="width:14px"></i><i class="bg3" style="width:56px"></i><i class="bgy" style="width:20px"></i>
-                                <b class="boot-scan"></b>
-                        </div>
+        <div class="boot-vig"></div>
+        <div class="boot-stage">
+                <div class="boot-ggrow">
+                        <div class="gg-symbol gg-symbol--disc bs"></div>
+                        <div class="gg-symbol gg-symbol--rect gg-symbol--3 gg-symbol--gradient bs"></div>
+                        <div class="gg-symbol bs"></div>
+                        <div class="gg-symbol gg-symbol--rect gg-symbol--5 gg-symbol--gradient bs"></div>
+                        <div class="gg-symbol gg-symbol--disc bs"></div>
                 </div>
+        </div>
+        <div class="boot-flash"></div>
         </div>
         <div class="FakeScroll"></div>
         <div class="gl"></div>
@@ -163,6 +174,16 @@ html.fx-lock { overflow: hidden !important; }
         <div class="Container">
                 <div class="Content">
                         <div class="Section Home" data-component="Home">
+                        <div id="mz-foto" title="Passe o mouse para revelar">
+                                <div class="mz-foto-tri-wrap">
+                                        <div class="mz-foto-tri"></div>
+                                        <div class="mz-foto-tri2"></div>
+                                </div>
+                                <div class="mz-foto-people">
+                                        <img class="mz-foto-img mz-foto-avatar" src="static/mz-avatar-cut.png" alt="Avatar do Marcus" draggable="false">
+                                        <img class="mz-foto-img mz-foto-marcus" src="static/mz-marcus-cut.png" alt="Marcus de Almeida" draggable="false">
+                                </div>
+                        </div>
                                 <div class="Home-content">
                                         <div class="gg">
                                                 <div class="gg-symbol gg-symbol--rect gg-symbol--5 gg-symbol--gradient"></div>
