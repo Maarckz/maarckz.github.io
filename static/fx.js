@@ -23,6 +23,12 @@
   function easeOutCubic(t) {
     return 1 - Math.pow(1 - t, 3);
   }
+  function easeOutBack(t, c) {
+    return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
+  }
+  function rnd(a, b) {
+    return a + Math.random() * (b - a);
+  }
   function recover() {
     if (state.dead) return;
     state.dead = true;
@@ -54,42 +60,46 @@
   }
   var SS_KEY = "mz_b5";
   var TL = {
-    barDur: 420,
-    barStag: 64,
-    lineAt: 700,
-    lineDur: 550,
-    scanAt: 120,
-    scanDur: 1450,
-    exitAt: 1650,
-    outDur: 380,
-    fadeDur: 460
+    rowAt: 120,
+    sym0: 340,
+    symStep: 200,
+    symDur: 300,
+    exitAt: 2160,
+    outDur: 430,
+    fadeDur: 520
   };
   var TLF = {
-    barDur: 300,
-    barStag: 34,
-    lineAt: 330,
-    lineDur: 400,
-    scanAt: 60,
-    scanDur: 800,
-    exitAt: 950,
-    outDur: 340,
-    fadeDur: 440
+    rowAt: 40,
+    sym0: 120,
+    symStep: 110,
+    symDur: 200,
+    exitAt: 1060,
+    outDur: 350,
+    fadeDur: 460
   };
   var bz = {
     overlay: null,
     stage: null,
-    line: null,
-    scan: null,
-    bars: [],
-    barsW: 1,
+    row: null,
+    syms: [],
+    landed: [],
+    hT: [],
+    pAt: [],
+    pDur: [],
+    pdx: [],
+    pdy: [],
+    prot: [],
+    pc: [],
+    pph: [],
     t0: 0,
+    lastT: 0,
     raf: 0,
     tl: TL,
     running: false,
     exiting: false,
+    holding: false,
     gateWaited: 0,
-    rmAt: 0,
-    holding: false
+    rmAt: 0
   };
   function msSincePaint() {
     try {
@@ -103,15 +113,77 @@
     return 0;
   }
   function bootMarkup() {
-    return '<div class="boot-stage">' + '<div class="boot-line"></div>' + '<div class="boot-bars">' + '<i class="bg1" style="width:40px"></i>' + '<i class="bgy" style="width:20px"></i>' + '<i class="bdisc" style="width:14px"></i>' + '<i class="bg2" style="width:72px"></i>' + '<i class="bsq" style="width:14px"></i>' + '<i class="bg3" style="width:56px"></i>' + '<i class="bgy" style="width:20px"></i>' + '<b class="boot-scan"></b>' + "</div>" + "</div>";
+    return '<div class="boot-vig"></div>' + '<div class="boot-stage">' + '<div class="boot-ggrow">' + '<div class="gg-symbol gg-symbol--disc bs"></div>' + '<div class="gg-symbol gg-symbol--rect gg-symbol--3 gg-symbol--gradient bs"></div>' + '<div class="gg-symbol bs"></div>' + '<div class="gg-symbol gg-symbol--rect gg-symbol--5 gg-symbol--gradient bs"></div>' + '<div class="gg-symbol gg-symbol--disc bs"></div>' + "</div>" + "</div>" + '<div class="boot-flash"></div>';
+  }
+  var PAL = ["#FFDA7A", "#FF6969", "#F29FFF", "#7C99FF"];
+  function paintRow() {
+    Array.prototype.forEach.call(bz.syms, function(el) {
+      if (!/\bgg-symbol--gradient\b/.test(el.className) || el.style.background) return;
+      var a = Math.floor(Math.random() * 4);
+      var b = (a + 1 + Math.floor(Math.random() * 3)) % 4;
+      el.style.background = "linear-gradient(90deg, " + PAL[a] + " 0%, " + PAL[b] + " 100%)";
+    });
+  }
+  function buildRow() {
+    var small = window.innerWidth < 768;
+    var maxU = small ? Math.round(rnd(22, 26)) : Math.round(rnd(34, 44));
+    var targetN = Math.round(rnd(8, 12));
+    var pDisc = small ? .38 : .3;
+    var pSqr = small ? .68 : .52;
+    var wMax = small ? 3 : 5;
+    var frag = "";
+    var units = 0;
+    var n = 0;
+    var guard = 0;
+    while (n < targetN && guard < 90) {
+      guard++;
+      var r = Math.random();
+      var u;
+      var cls;
+      if (r < pDisc) {
+        cls = "gg-symbol gg-symbol--disc bs";
+        u = 1;
+      } else if (r < pSqr) {
+        cls = "gg-symbol bs";
+        u = 1;
+      } else {
+        var w = 1 + Math.floor(Math.random() * wMax);
+        u = w * 2;
+        cls = "gg-symbol gg-symbol--rect gg-symbol--" + w + (Math.random() < .5 ? " gg-symbol--gradient" : "") + " bs";
+      }
+      var need = (n ? 1 : 0) + u;
+      if (units + need > maxU) {
+        if (n >= 6) break;
+        continue;
+      }
+      frag += '<div class="' + cls + '"></div>';
+      units += need;
+      n++;
+    }
+    if (n < 6) return buildRow();
+    return frag;
+  }
+  function planRow() {
+    var nS = bz.syms.length;
+    var T = bz.tl;
+    var avail = T.exitAt - T.sym0 - Math.round(T.symDur * 1.45) - 200;
+    var gapAvg = Math.max(50, avail / Math.max(1, nS - 1));
+    var at = T.sym0;
+    for (var i = nS - 1; i >= 0; i--) {
+      bz.pDur[i] = Math.round(T.symDur * rnd(.75, 1.45));
+      var cap = T.exitAt - bz.pDur[i] - 130;
+      if (at > cap) at = Math.max(T.sym0, cap);
+      bz.pAt[i] = Math.round(at);
+      bz.pdx[i] = Math.round(rnd(14, 32)) * (Math.random() < .5 ? -1 : 1);
+      bz.pdy[i] = Math.random() < .45 ? 0 : Math.round(rnd(4, 10)) * (Math.random() < .5 ? -1 : 1);
+      bz.prot[i] = Math.random() < .5 ? 0 : +rnd(-4, 4).toFixed(2);
+      bz.pc[i] = +rnd(1.2, 2.3).toFixed(2);
+      bz.pph[i] = +rnd(0, 6.28).toFixed(2);
+      at += Math.round(gapAvg * rnd(.55, 1.45));
+    }
   }
   function initBoot() {
     var overlay = document.getElementById("mz-boot");
-    if (reduced) {
-      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      finishBoot();
-      return;
-    }
     if (!overlay) {
       overlay = document.createElement("div");
       overlay.id = "mz-boot";
@@ -120,13 +192,24 @@
     }
     bz.overlay = overlay;
     bz.stage = overlay.querySelector(".boot-stage");
-    bz.line = overlay.querySelector(".boot-line");
-    bz.scan = overlay.querySelector(".boot-scan");
-    bz.bars = [].slice.call(overlay.querySelectorAll(".boot-bars i"));
-    if (!bz.stage || !bz.bars.length) {
+    bz.row = overlay.querySelector(".boot-ggrow");
+    if (!bz.stage || !bz.row) {
       finishBoot();
       return;
     }
+    bz.row.innerHTML = buildRow();
+    bz.syms = Array.prototype.slice.call(bz.row.querySelectorAll(".bs"));
+    bz.landed = bz.syms.map(function() {
+      return false;
+    });
+    bz.hT = bz.syms.map(function() {
+      return 0;
+    });
+    if (!bz.syms.length) {
+      finishBoot();
+      return;
+    }
+    paintRow();
     var elapsed = msSincePaint();
     if (elapsed > 2e3) {
       finishBoot();
@@ -140,69 +223,73 @@
       fast = !!sessionStorage.getItem(SS_KEY);
     } catch (e) {}
     bz.tl = fast ? TLF : TL;
+    planRow();
     overlay.classList.add("mz-live");
     doc.classList.add("fx-lock");
     overlay.addEventListener("pointerdown", skipBoot, {
       passive: true
     });
     window.addEventListener("keydown", skipBoot);
-    bz.barsW = bz.overlay.querySelector(".boot-bars").getBoundingClientRect().width || 1;
     bz.running = true;
     bz.t0 = performance.now() - Math.max(0, Math.min(elapsed, bz.tl.exitAt));
+    bz.lastT = 0;
     bz.raf = requestAnimationFrame(stepBoot);
   }
   function skipBoot() {
     if (!bz.running || bz.exiting) return;
     bz.t0 = performance.now() - bz.tl.exitAt;
   }
+  function goAt(el, t, at) {
+    if (el && t >= at) el.classList.add("go");
+  }
   function stepBoot(now) {
     if (!bz.running) return;
     var t = now - bz.t0;
     var T = bz.tl;
-    var i, k;
-    for (i = 0; i < bz.bars.length; i++) {
-      var bt = clamp((t - i * T.barStag) / T.barDur, 0, 1);
-      bz.bars[i].style.transform = "scaleX(" + easeOutCubic(bt).toFixed(4) + ")";
-    }
-    if (bz.line) {
-      var lk = easeOutCubic(clamp((t - T.lineAt) / T.lineDur, 0, 1));
-      bz.line.style.transform = "scaleX(" + lk.toFixed(4) + ")";
-    }
-    var gate = !bz.exiting && t > T.scanAt && (document.readyState !== "complete" || document.querySelector(".Loader"));
+    var dt = bz.lastT ? Math.min(50, t - bz.lastT) : 16;
+    bz.lastT = t;
+    goAt(bz.row, t, T.rowAt);
+    var gate = !bz.exiting && t > 800 && (document.readyState !== "complete" || document.querySelector(".Loader"));
     bz.holding = gate && t >= T.exitAt;
-    if (bz.scan) {
-      var skN = (t - T.scanAt) / T.scanDur;
-      if (bz.holding) skN = skN % ((T.scanDur + 380) / T.scanDur);
-      var sk = clamp(skN, 0, 1);
-      if (sk <= 0 || sk >= 1) {
-        bz.scan.style.opacity = "0";
-      } else {
-        var op = sk < .12 ? sk / .12 : sk > .85 ? (1 - sk) / .15 : 1;
-        bz.scan.style.opacity = op.toFixed(3);
-        bz.scan.style.transform = "translateX(" + (sk * bz.barsW).toFixed(1) + "px)";
+    for (var i = 0; i < bz.syms.length; i++) {
+      var el = bz.syms[i];
+      var k = clamp((t - bz.pAt[i]) / bz.pDur[i], 0, 1);
+      var eB = easeOutBack(k, bz.pc[i]);
+      var x = bz.pdx[i] * (1 - eB);
+      var y = bz.pdy[i] * (1 - easeOutCubic(k));
+      var r = bz.prot[i] * (1 - eB);
+      var op = easeOutCubic(k);
+      if (bz.holding) op = 1 - .38 * (0.5 + 0.5 * Math.sin(t * .006 + bz.pph[i]));
+      el.style.opacity = op.toFixed(3);
+      el.style.transform = "translate(" + x.toFixed(2) + "px," + y.toFixed(2) + "px)" + (r ? " rotate(" + r.toFixed(2) + "deg)" : "");
+      if (k >= 1 && !bz.landed[i]) {
+        bz.landed[i] = true;
+        bz.hT[i] = t;
+        el.classList.add("hit");
+      }
+      if (bz.landed[i] && bz.hT[i] && t - bz.hT[i] > 240) {
+        el.classList.remove("hit");
+        bz.hT[i] = 0;
       }
     }
     var exitAt = T.exitAt;
     if (gate && t >= exitAt) {
-      bz.gateWaited += 16;
+      bz.gateWaited += dt;
       if (bz.gateWaited < 3500) exitAt += 3500;
     }
+    var exK = 0;
     if (t >= exitAt) {
       if (!bz.exiting) {
         bz.exiting = true;
-        bz.rmAt = t + T.outDur + T.fadeDur + 120;
+        bz.rmAt = t + T.outDur + T.fadeDur + 140;
         try {
           sessionStorage.setItem(SS_KEY, "1");
         } catch (e) {}
         bz.overlay.classList.add("boot-done");
+        bz.overlay.classList.add("boot-out");
         finishBoot();
       }
-      var ok = clamp((t - exitAt) / T.outDur, 0, 1);
-      var oe = easeInOutCubic(ok);
-      bz.stage.style.opacity = (1 - oe).toFixed(3);
-      bz.stage.style.filter = "blur(" + (oe * 8).toFixed(1) + "px)";
-      bz.stage.style.transform = "translate(" + (-26 * oe).toFixed(1) + "px," + (-14 * oe).toFixed(1) + "px)";
-      var fk = clamp((t - exitAt - 30) / T.fadeDur, 0, 1);
+      var fk = clamp((t - exitAt - 50) / T.fadeDur, 0, 1);
       bz.overlay.style.background = "rgba(13, 19, 22, " + (1 - easeInOutCubic(fk)).toFixed(3) + ")";
     }
     if (bz.exiting && t >= bz.rmAt) {
@@ -427,11 +514,55 @@
     state.docH = Math.max(1, doc.scrollHeight);
     sbMeasure();
     measureReveals();
+    fotoPlace();
   }
   function onResize() {
     recalc();
-    if (bz.running && bz.overlay) {
-      bz.barsW = bz.overlay.querySelector(".boot-bars").getBoundingClientRect().width || 1;
+  }
+  var fz = {
+    f: null
+  };
+  function fotoPlace() {
+    var f = fz.f;
+    if (!f) return;
+    if (window.innerWidth < 768) {
+      f.style.display = "none";
+      f.style.left = "";
+      f.style.right = "";
+      return;
+    }
+    f.style.display = "";
+    var t = document.querySelector(".Home-content");
+    if (!t) return;
+    var tr = t.getBoundingClientRect().right;
+    if (!tr) return;
+    var fw = f.getBoundingClientRect().width;
+    if (!fw) return;
+    var maxLeft = Math.round(window.innerWidth - fw - 24);
+    var left = Math.round(tr + (window.innerWidth - tr) / 2 - fw / 2) - 44;
+    if (maxLeft < Math.round(tr + 24)) {
+      left = maxLeft;
+    } else {
+      if (left < Math.round(tr + 24)) left = Math.round(tr + 24);
+      if (left > maxLeft) left = maxLeft;
+    }
+    f.style.right = "auto";
+    f.style.left = left + "px";
+  }
+  function initFoto() {
+    var f = document.getElementById("mz-foto");
+    if (!f) return;
+    fz.f = f;
+    fotoPlace();
+    var m = f.querySelector(".mz-foto-marcus");
+    if (m && !m.complete) {
+      var i = new Image();
+      i.src = m.src;
+    }
+    if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
+      f.addEventListener("click", function() {
+        f.classList.toggle("mz-foto-reveal");
+      });
     }
   }
   function init() {
@@ -442,6 +573,7 @@
     initBoot();
     initReveals();
     initCursor();
+    initFoto();
     state.docH = Math.max(1, doc.scrollHeight);
     window.addEventListener("resize", function() {
       clearTimeout(window.__mzRz);

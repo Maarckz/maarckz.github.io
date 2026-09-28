@@ -1,92 +1,13 @@
 (function() {
   "use strict";
-  var KEY_B64 = "Z3NrXzVQM3JzVFg2R3VGWTBNUkNJVmZWV0dkeWIzRll5WTV1SmJlWlhEN2E4ZXQxV0xzSXhlU1U=";
-  var GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-  var GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models";
-  var MODEL_MAIN = "llama-3.1-8b-instant";
-  var MODEL_FALLBACK = "llama-3.3-70b-versatile";
-  var POLLEN_POST = "https://text.pollinations.ai/openai";
-  var POLLEN_GET = "https://text.pollinations.ai/";
   var LS_HIST = "mz_chat_hist_v1";
   var LS_TIP = "mz_chat_tip_v1";
   var LS_DOCK = "mz_dock_v1";
-  var SS_GROQ = "mz_groq_dead";
-  var LS_GROQ_KEY = "mz_groq_key";
-  function groqKey() {
-    try {
-      var k = String(localStorage.getItem(LS_GROQ_KEY) || "").replace(/^\s+|\s+$/g, "");
-      if (k.indexOf("gsk_") === 0) return k;
-    } catch (e) {}
-    try {
-      return atob(KEY_B64);
-    } catch (e) {
-      return "";
-    }
-  }
   var SVG_SEND = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>';
   var SVG_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
   var SVG_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
   function clean(s) {
     return String(s || "").replace(/\s+/g, " ").trim();
-  }
-  function collectContext() {
-    var ctx = {
-      nome: document.title,
-      projetos: [],
-      links: []
-    };
-    var h1 = document.querySelector(".Title h1");
-    if (h1) ctx.nome = clean(h1.textContent);
-    var subs = [];
-    document.querySelectorAll(".Title .subtitle").forEach(function(el) {
-      var t = clean(el.textContent);
-      if (t && subs.indexOf(t) === -1) subs.push(t);
-    });
-    ctx.areas = subs;
-    var about = [];
-    document.querySelectorAll(".About-content p").forEach(function(el) {
-      about.push(clean(el.textContent));
-    });
-    ctx.sobre = about.join(" ");
-    var seen = {};
-    document.querySelectorAll(".WorkItem").forEach(function(a) {
-      var t = clean(a.querySelector(".WorkItem-title") && a.querySelector(".WorkItem-title").textContent);
-      var s = clean(a.querySelector(".WorkItem-subtitle") && a.querySelector(".WorkItem-subtitle").textContent);
-      var href = a.getAttribute("href") || "";
-      if (t && !seen[t]) {
-        seen[t] = 1;
-        ctx.projetos.push({
-          t: t,
-          s: s,
-          url: href
-        });
-      }
-    });
-    var seenL = {};
-    document.querySelectorAll("a[href]").forEach(function(a) {
-      var href = a.getAttribute("href");
-      if (!href || href.charAt(0) === "#" || href === "") return;
-      if (!/^https?:/i.test(href)) return;
-      var label = clean(a.textContent) || href;
-      if (!seenL[href]) {
-        seenL[href] = 1;
-        ctx.links.push({
-          t: label.slice(0, 60),
-          url: href
-        });
-      }
-    });
-    ctx.secoes = [];
-    document.querySelectorAll(".Section h3").forEach(function(h) {
-      var t = clean(h.textContent);
-      if (t && ctx.secoes.indexOf(t) === -1) ctx.secoes.push(t);
-    });
-    return ctx;
-  }
-  function buildSystemPrompt() {
-    var ctx = collectContext();
-    var json = JSON.stringify(ctx);
-    return "Você é o BOT oficial do site pessoal de Marcus de Almeida (apelido: Maarckz), " + "profissional de Cyber Security (Purple Team, Threat Hunting, Cyber Threat Intelligence, DFIR, SOC T2/T3).\n\n" + "CONTEXTO REAL DO SITE (extraído da página — fonte da verdade):\n" + json + "\n\n" + "REGRAS:\n" + "- Responda no idioma do usuário; padrão: português brasileiro.\n" + "- Máximo ~120 palavras. Direto ao ponto, sem enrolação.\n" + "- NUNCA use tabelas markdown (nada do tipo | coluna | --- |): ficam quebradas e feias no chat. Use listas com hífen ou frases curtas.\n" + "- NUNCA use títulos markdown (#, ##, ###). Para destacar um título de linha, use **negrito**.\n" + "- Use **negrito** para destaques e links no formato [texto](url) ao citar projetos, GitHub, LinkedIn etc.\n" + "- Baseie-se SOMENTE no contexto acima. Não invente projetos, certificações, datas ou links.\n" + "- Se algo não estiver no contexto, diga que não encontra essa info no site e sugira o LinkedIn ou GitHub dele.\n" + "- Tom: profissional, amigável, com um toque geek (o tema é segurança ofensiva/defensiva).\n" + "- Se perguntarem quem você é: você é o assistente virtual do portfólio.";
   }
   function escapeHtml(s) {
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -133,7 +54,7 @@
     return src.replace(/\n/g, "<br>");
   }
   var goo, blob, trail, dotBtn, panel, msgsEl, input, sendBtn, tipEl;
-  var open = false, pending = false, live = false, noted = false;
+  var open = false, pending = false, live = false;
   var history = [];
   function loadHist() {
     try {
@@ -165,10 +86,10 @@
     msgsEl.scrollTop = msgsEl.scrollHeight;
     return d;
   }
-  var WELCOME = "Olá! Eu sou o **bot do portfólio** do Marcus (Maarckz). Pergunte sobre **projetos**, **certificações**, **formação** ou peça os **links** — eu respondo na hora. Por onde começamos?";
+  var WELCOME = "Olá! O que gostaria de perguntar?";
   var CHIPS = [ "Quem é o Marcus?", "Quais são seus projetos?", "Quais certificações ele tem?", "Quais os links úteis?" ];
   function norm(s) {
-    return String(s || "").toLowerCase().replace(/[áàâãä]/g, "a").replace(/[éèêë]/g, "e").replace(/[íìîï]/g, "i").replace(/[óòôõö]/g, "o").replace(/[úùûü]/g, "u").replace(/ç/g, "c");
+    return String(s || "").toLowerCase().replace(/[áàâãä]/g, "a").replace(/[éèêë]/g, "e").replace(/[íìîï]/g, "i").replace(/[óòôõö]/g, "o").replace(/[úùûü]/g, "u").replace(/ç/g, "c").replace(/[^a-z0-9\s]/g, " ");
   }
   function QUICK_WHO() {
     return "**Marcus de Almeida (Maarckz)** é profissional de **Cyber Security**, " + "focado em segurança ofensiva e inteligência de ameaças: Purple Team, Threat Hunting, " + "Cyber Threat Intelligence, DFIR e SOC T2/T3. Tem mais de **uma década de estudos**, " + "graduação em Defesa Cibernética e pós em CTI & Hunting e Ethical Hacking. " + "Desde 2018 vive CTFs: **Top 1% no TryHackMe** (251+ salas, 35+ badges) e é " + "**Wazuh Ambassador** no Brasil. Mais no [LinkedIn](https://www.linkedin.com/in/marcus-dealmeida).";
@@ -215,18 +136,85 @@
   function QUICK_LINKS() {
     return "Os **links úteis** do Marcus:" + "\n- **LinkedIn** — [linkedin.com/in/marcus-dealmeida](https://www.linkedin.com/in/marcus-dealmeida)" + "\n- **GitHub** — [github.com/Maarckz](https://github.com/Maarckz)" + "\n- **Instagram** — [instagram.com/Maarckz](https://www.instagram.com/Maarckz)" + "\n- **Notes** — [maarckz.github.io/Notes](https://maarckz.github.io/Notes/)" + "\n- **4Root** — [4root.com.br](https://4root.com.br)" + "\n- **Bot de CVEs no Telegram** — [t.me/cve_4root_bot](https://t.me/cve_4root_bot)";
   }
+  function ANSW_SKILLS() {
+    return "Skills do Marcus: **Threat Research**, **Threat Hunting**, **Cyber Threat Intelligence (CTI)**, **Purple Team**, **DFIR**, **SOC T2/T3** e contribuições **OpenSource**. Detalhes no [LinkedIn](https://www.linkedin.com/in/marcus-dealmeida).";
+  }
+  function ANSW_EXP() {
+    return "Mais de **uma década de estudos** em Cyber Security: graduação em **Defesa Cibernética**, pós em **CTI & Hunting** e **Ethical Hacking**, e desde **2018** vivendo CTFs (**Top 1% no TryHackMe**).";
+  }
+  function ANSW_CTF() {
+    return "Marcus é **Top 1% no TryHackMe** — **251+ salas** e **35+ badges** — e vive CTFs desde **2018**. Alguns viraram projeto: [github.com/Maarckz](https://github.com/Maarckz).";
+  }
+  function ANSW_WAZUH() {
+    return "O Marcus é **Wazuh Ambassador** no Brasil — embaixador da plataforma open source de security monitoring e XDR **Wazuh**. Mais no [LinkedIn](https://www.linkedin.com/in/marcus-dealmeida) dele.";
+  }
+  function ANSW_CONTACT() {
+    return "Os melhores canais para falar com o Marcus:\n- **LinkedIn** — [linkedin.com/in/marcus-dealmeida](https://www.linkedin.com/in/marcus-dealmeida)\n- **GitHub** — [github.com/Maarckz](https://github.com/Maarckz)\n- **Instagram** — [instagram.com/Maarckz](https://www.instagram.com/Maarckz)";
+  }
+  function ANSW_4ROOT() {
+    return "**4Root** — [4root.com.br](https://4root.com.br) — projeto de segurança ligado ao Marcus, com **bot de CVEs no Telegram**: [t.me/cve_4root_bot](https://t.me/cve_4root_bot).";
+  }
+  function ANSW_NOTES() {
+    return "As **Notes** dele ficam em [maarckz.github.io/Notes](https://maarckz.github.io/Notes/) — anotações e estudos da área.";
+  }
+  function ANSW_LI() {
+    return "O **LinkedIn** do Marcus: [linkedin.com/in/marcus-dealmeida](https://www.linkedin.com/in/marcus-dealmeida) — certs, experiência e contato por lá.";
+  }
+  function ANSW_GH() {
+    return "O **GitHub** do Marcus: [github.com/Maarckz](https://github.com/Maarckz) — projetos, ferramentas e os CTFs dele.";
+  }
+  function ANSW_IG() {
+    return "O **Instagram** do Marcus: [instagram.com/Maarckz](https://www.instagram.com/Maarckz).";
+  }
+  function ANSW_BOT() {
+    return "Sou o **bot do portfólio** do Marcus (Maarckz). Sei falar sobre o Marcus: **quem é ele**, **projetos**, **certificações**, **skills**, **CTF**, **experiência** e **links**.";
+  }
+  function ANSW_HELP() {
+    return "Posso falar sobre: **quem é o Marcus**, **projetos**, **certificações**, **skills**, **experiência**, **CTF/TryHackMe**, **Wazuh**, **4Root**, **contato** e **links úteis**. É só perguntar ou tocar numa das perguntas acima.";
+  }
+  function ANSW_HOW() {
+    return "Tudo certo por aqui! Enquanto isso posso falar sobre o Marcus: **projetos**, **certificações**, **skills**, **links**…";
+  }
+  function ANSW_HI() {
+    return "Oi! Sobre o que você quer saber: **quem é o Marcus**, **projetos**, **certificações**, **skills**, **CTF** ou **links**?";
+  }
+  function ANSW_THX() {
+    return "Por nada! Se precisar, é só perguntar de novo — estou do lado de cá do navegador.";
+  }
+  function ANSW_JOKE() {
+    return "Uma clássica da área: existem **10 tipos de pessoas** — as que entendem binário… e as que não entendem. ";
+  }
+  function ANSW_FALLBACK() {
+    return "Não é possível realizar essa ação. Só sei falar sobre o Marcus: **quem é ele**, **projetos**, **certificações**, **skills**, **experiência**, **CTF**, **contato** e **links**. Toca em uma das perguntas acima ou tenta uma dessas.";
+  }
+  var RULES = [
+    [/(certific|credencial)/, function() { return QUICK_CERTS(); }],
+    [/(projeto|codes|repo|repositorio)/, function() { return QUICK_PROJECTS(); }],
+    [/(ctf|tryhackme|thm|hackthebox|htb|capture the flag)/, ANSW_CTF],
+    [/wazuh/, ANSW_WAZUH],
+    [/(skill|habilidade|competencia|tecnologia|stack|ferramenta|linguagem|especialidade|area de atua|foco)/, ANSW_SKILLS],
+    [/(experiencia|anos de|tempo de|carreira|formacao|graduacao|faculdade|estudou|estuda)/, ANSW_EXP],
+    [/(contato|contact|email|e mail|contratar|freela|freelance|vaga|emprego|orcamento|consultoria|falar com)/, ANSW_CONTACT],
+    [/(4root|4 root)/, ANSW_4ROOT],
+    [/(telegram|cve|t me)/, ANSW_4ROOT],
+    [/(notes|anotac|notas)/, ANSW_NOTES],
+    [/linkedin/, ANSW_LI],
+    [/github|repos/, ANSW_GH],
+    [/(instagram|insta)/, ANSW_IG],
+    [/(link|redes|onde ach|onde encontr|onde consigo)/, function() { return QUICK_LINKS(); }],
+    [/(marcus|maarckz|quem e ele|dono do (site|portfolio)|apresenta)/, function() { return QUICK_WHO(); }],
+    [/(quem (e|es) voce|voce e (um|uma)|voce e o bot|voce e humano|voce e real|e robo|e um bot|(ia|bot|robo|chatbot) local|(\s|^)(ia|bot|robo|chatbot)(\s|$)|seu nome|como se chama)/, ANSW_BOT],
+    [/(ajuda|help|o que (voce|vc) (faz|pode|sabe)|opcoes|comandos|menu)/, ANSW_HELP],
+    [/(piada|engracad|humor|zoeira)/, ANSW_JOKE],
+    [/(tudo bem|tudo bom|como vai|como (voce|vc) esta|como ta|beleza|de boa)/, ANSW_HOW],
+    [/(^|\s)(oi|ola|opa|hey|hello|hi|salve|eai|e ai|bom dia|boa tarde|boa noite|fala)(\s|$)/, ANSW_HI],
+    [/(obrigad|valeu|vlw|brigad|thanks|thank you|grato)/, ANSW_THX]
+  ];
   function quickAnswer(q) {
     var t = norm(q);
     if (!t) return null;
-    if (t.indexOf("marcus") > -1 && (t.indexOf("quem") > -1 || t.indexOf("sobre") > -1 || t.indexOf("apresenta") > -1 || t.indexOf("diz") > -1)) {
-      return QUICK_WHO();
-    }
-    if (t.indexOf("certific") > -1) return QUICK_CERTS();
-    if (t.indexOf("projeto") > -1 || t.indexOf("codes") > -1 || t.indexOf("repo") > -1) {
-      return QUICK_PROJECTS();
-    }
-    if (t.indexOf("link") > -1 || t.indexOf("contato") > -1 || t.indexOf("redes") > -1 || t.indexOf("onde") > -1 && (t.indexOf("ach") > -1 || t.indexOf("encontr") > -1)) {
-      return QUICK_LINKS();
+    for (var i = 0; i < RULES.length; i++) {
+      if (RULES[i][0].test(t)) return RULES[i][1]();
     }
     return null;
   }
@@ -554,218 +542,6 @@
       toggle: togglePanel
     };
   }
-  function pickContent(j) {
-    return j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content || "";
-  }
-  function groqDead() {
-    try {
-      return sessionStorage.getItem(SS_GROQ) === "1";
-    } catch (e) {
-      return false;
-    }
-  }
-  function noteFallback() {
-    if (noted) return;
-    noted = true;
-    try {
-      addMsg("bot", "Nota: o Groq não respondeu agora — usando o <strong>modo alternativo de IA</strong>.", "msg--bot msg--note");
-    } catch (e) {}
-  }
-  function callGroq(model, messages) {
-    var ctrl = new AbortController;
-    var to = setTimeout(function() {
-      ctrl.abort();
-    }, 14e3);
-    return fetch(GROQ_URL, {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + groqKey(),
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: messages,
-        temperature: .65,
-        max_tokens: 600
-      }),
-      signal: ctrl.signal
-    }).then(function(res) {
-      clearTimeout(to);
-      if (!res.ok) {
-        return res.json().catch(function() {
-          return {};
-        }).then(function(j) {
-          var err = new Error("groq_" + res.status);
-          err.status = res.status;
-          err.body = j;
-          throw err;
-        });
-      }
-      return res.json();
-    });
-  }
-  function pollenPost(messages) {
-    var ctrl = new AbortController;
-    var to = setTimeout(function() {
-      ctrl.abort();
-    }, 32e3);
-    return fetch(POLLEN_POST, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "openai",
-        messages: messages,
-        temperature: .65
-      }),
-      signal: ctrl.signal
-    }).then(function(res) {
-      clearTimeout(to);
-      if (!res.ok) throw new Error("pollen_" + res.status);
-      return res.json();
-    }).then(pickContent);
-  }
-  function pollenGet(messages) {
-    var ctrl = new AbortController;
-    var to = setTimeout(function() {
-      ctrl.abort();
-    }, 32e3);
-    var flat = messages.filter(function(m) {
-      return m.role !== "system";
-    }).slice(-6).map(function(m) {
-      return (m.role === "user" ? "Q: " : "A: ") + m.content;
-    }).join("\n");
-    var sys = "Você é o bot do portfólio de Marcus de Almeida (Maarckz), de Cyber Security. Responda curto, em pt-BR, use **negrito** e links [texto](url).";
-    var url = POLLEN_GET + encodeURIComponent(flat.slice(0, 1500)) + "?model=openai&system=" + encodeURIComponent(sys);
-    return fetch(url, {
-      signal: ctrl.signal
-    }).then(function(res) {
-      clearTimeout(to);
-      if (!res.ok) throw new Error("pollen_get_" + res.status);
-      return res.text();
-    }).then(function(t) {
-      t = String(t || "").trim();
-      if (!t) throw new Error("pollen_get_empty");
-      return t;
-    });
-  }
-  var SS_MODELS = "mz_groq_models";
-  var modelCache = null;
-  function getGroqModels() {
-    if (modelCache && Date.now() - modelCache.t < 36e5) {
-      return Promise.resolve(modelCache.ids);
-    }
-    try {
-      var raw = sessionStorage.getItem(SS_MODELS);
-      if (raw) {
-        var j = JSON.parse(raw);
-        if (j && j.ids && j.ids.length && Date.now() - j.t < 36e5) {
-          modelCache = j;
-          return Promise.resolve(j.ids);
-        }
-      }
-    } catch (e) {}
-    var ctrl = new AbortController;
-    var to = setTimeout(function() {
-      ctrl.abort();
-    }, 6e3);
-    return fetch(GROQ_MODELS_URL, {
-      headers: {
-        Authorization: "Bearer " + groqKey()
-      },
-      signal: ctrl.signal
-    }).then(function(res) {
-      clearTimeout(to);
-      if (!res.ok) throw new Error("models_" + res.status);
-      return res.json();
-    }).then(function(j) {
-      var ids = [];
-      (j && j.data ? j.data : []).forEach(function(m) {
-        if (m && m.id && m.active !== false) ids.push(m.id);
-      });
-      if (!ids.length) throw new Error("models_empty");
-      modelCache = {
-        t: Date.now(),
-        ids: ids
-      };
-      try {
-        sessionStorage.setItem(SS_MODELS, JSON.stringify(modelCache));
-      } catch (e) {}
-      return ids;
-    }).catch(function() {
-      return [];
-    });
-  }
-  function pickCandidates(ids) {
-    var pref = [];
-    function has(re) {
-      for (var i = 0; i < ids.length; i++) {
-        if (re.test(ids[i]) && pref.indexOf(ids[i]) === -1) pref.push(ids[i]);
-      }
-    }
-    if (ids.length) {
-      has(/^llama-3\.1-8b-instant$/);
-      has(/^llama-3\.3-70b-versatile$/);
-      has(/^llama-3\.1-70b-versatile$/);
-      has(/llama.*instant/i);
-      has(/llama.*versatile/i);
-    }
-    if (!pref.length) pref = [ MODEL_MAIN, MODEL_FALLBACK ];
-    return pref.slice(0, 3);
-  }
-  function ask(messages) {
-    var chain;
-    if (groqDead() || !groqKey()) {
-      noted = true;
-      chain = Promise.reject(new Error("groq_skip"));
-    } else {
-      chain = getGroqModels().then(pickCandidates).then(function(candidates) {
-        var i = 0;
-        function tryNext() {
-          if (i >= candidates.length) throw new Error("groq_exhausted");
-          var model = candidates[i++];
-          return callGroq(model, messages).then(function(j) {
-            var c = pickContent(j);
-            if (!c) throw new Error("empty");
-            return {
-              text: c
-            };
-          }).catch(function(err) {
-            var st = err && err.status;
-            if (st === 401 || st === 403) {
-              try {
-                sessionStorage.setItem(SS_GROQ, "1");
-              } catch (e) {}
-              noteFallback();
-              throw err;
-            }
-            if (st === 400 || st === 404 || st === 429 || st >= 500 || err.name === "TypeError" || err.name === "AbortError") {
-              return tryNext();
-            }
-            throw err;
-          });
-        }
-        return tryNext();
-      });
-    }
-    return chain.catch(function(e1) {
-      var retryable = e1 && (e1.message === "groq_skip" || e1.message === "groq_exhausted" || e1.message === "empty" || e1.status === 401 || e1.status === 403 || e1.status === 429 || e1.status >= 500 || e1.name === "TypeError" || e1.name === "AbortError");
-      if (!retryable) throw e1;
-      return pollenPost(messages).then(function(c) {
-        if (!c) throw new Error("empty");
-        return {
-          text: c
-        };
-      }).catch(function() {
-        return pollenGet(messages).then(function(c) {
-          return {
-            text: c
-          };
-        });
-      });
-    });
-  }
   function send(forcedText) {
     if (pending) return;
     var text = clean(forcedText || input.value);
@@ -796,41 +572,19 @@
       }, 480 + Math.random() * 320);
       return;
     }
-    var messages = [ {
-      role: "system",
-      content: buildSystemPrompt()
-    } ].concat(history.slice(-12));
-    function fail(msg) {
+    setTimeout(function() {
+      var fb = ANSW_FALLBACK();
       typing.remove();
-      addMsg("bot", msg, "msg--bot msg--err");
-      pending = false;
-      sendBtn.disabled = false;
-      msgsEl.scrollTop = msgsEl.scrollHeight;
-    }
-    if (typeof navigator !== "undefined" && navigator.onLine === false) {
-      fail("Sem conexão com a internet — verifica o Wi-Fi e tenta de novo.");
-      return;
-    }
-    ask(messages).then(function(r) {
-      typing.remove();
-      addMsg("bot", renderRich(r.text));
+      addMsg("bot", renderRich(fb));
       history.push({
         role: "assistant",
-        content: r.text
+        content: fb
       });
       saveHist();
       pending = false;
       sendBtn.disabled = false;
-    }).catch(function(err) {
-      var m = err && String(err.message || "");
-      if (m === "empty") {
-        fail("Recebi uma resposta vazia. Tenta reformular a pergunta?");
-      } else if (err && err.name === "AbortError") {
-        fail("A resposta demorou demais e foi cancelada. Tenta de novo?");
-      } else {
-        fail("Não consegui falar com nenhum serviço de IA agora (Groq e o fallback aberto falharam). Verifica sua conexão e tenta de novo.");
-      }
-    });
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+    }, 460 + Math.random() * 260);
   }
   function parseColor(tok) {
     tok = String(tok).trim();
