@@ -12,7 +12,8 @@
     vh: window.innerHeight,
     docH: 1,
     bootDone: false,
-    dead: false
+    dead: false,
+    warpOn: false
   };
   function clamp(v, a, b) {
     return v < a ? a : v > b ? b : v;
@@ -36,6 +37,9 @@
       document.querySelectorAll("[data-rv]").forEach(function(el) {
         el.removeAttribute("data-rv");
         el.classList.remove("rv-in");
+        el.style.removeProperty("opacity");
+        el.style.removeProperty("transform");
+        el.style.removeProperty("--translateX");
       });
       if (container) container.style.transform = "";
       var ob = document.getElementById("mz-boot");
@@ -358,10 +362,14 @@
     var sc = sb.h - sb.thumbH > 0 ? pos / (sb.h - sb.thumbH) : 0;
     window.scrollTo(0, sc * sb.maxScroll);
   }
+  var sbLastY = "";
   function sbUpdate() {
     if (!sbThumb) return;
     var p = clamp(state.sd / sb.maxScroll, 0, 1);
-    sbThumb.style.transform = "translateY(" + (p * (sb.h - sb.thumbH)).toFixed(1) + "px)";
+    var y = (p * (sb.h - sb.thumbH)).toFixed(1);
+    if (y === sbLastY) return;
+    sbLastY = y;
+    sbThumb.style.transform = "translateY(" + y + "px)";
   }
   function sbMeasure() {
     if (!sbTrack) return;
@@ -378,6 +386,35 @@
   }
   var REVEAL_SEL = ".Home-content .social-icons, " + ".Work-content h3, .Work-content ul li, .Work-content .gg, " + ".About-content h3, .About-content p, " + ".Experience-content h3, .Experience-content ul li, " + ".About-content .gg, .Experience-content .gg";
   var rvItems = [];
+  var rvAnime = false;
+  try {
+    rvAnime = typeof window.anime === "object" && typeof window.anime.animate === "function";
+  } catch (e) {
+    rvAnime = false;
+  }
+  if (rvAnime) doc.classList.add("fx-anime");
+  function rvTx(el) {
+    var m = getComputedStyle(el).transform;
+    if (!m || m === "none") return 0;
+    var p = m.match(/matrix\(([^)]+)\)/);
+    if (!p) return 0;
+    var v = parseFloat(p[1].split(",")[4]);
+    return isNaN(v) ? 0 : v;
+  }
+  function rvAnimeGo(el, batch) {
+    try {
+      window.anime.animate(el, {
+        opacity: { from: 0, to: 1 },
+        x: { from: rvTx(el), to: 0 },
+        ease: "outExpo",
+        duration: 1e3,
+        delay: batch * 70
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   function initReveals() {
     var els = document.querySelectorAll(REVEAL_SEL);
     els.forEach(function(el) {
@@ -405,8 +442,17 @@
       var it = rvItems[i];
       if (it.done || it.y > limit) continue;
       it.done = true;
-      it.el.style.setProperty("--rv-d", batch * .07 + "s");
-      it.el.classList.add("rv-in");
+      var isHome = it.el.closest ? !!it.el.closest(".Home-content") : false;
+      var useA = rvAnime && !reduced && !isHome;
+      if (useA && !rvAnimeGo(it.el, batch)) {
+        rvAnime = false;
+        doc.classList.remove("fx-anime");
+        useA = false;
+      }
+      if (!useA) {
+        it.el.style.setProperty("--rv-d", batch * .07 + "s");
+        it.el.classList.add("rv-in");
+      }
       batch++;
     }
   }
@@ -414,9 +460,13 @@
     el: null,
     x: -100,
     y: -100,
+    px: -100,
+    py: -100,
     on: false,
     idleT: 0,
-    glT: 0
+    glT: 0,
+    lastMove: 0,
+    idle: false
   };
   function killCursor() {
     cur.on = false;
@@ -458,12 +508,12 @@
       if (!cur.on || !cur.el) return;
       cur.x = e.clientX;
       cur.y = e.clientY;
-      cur.el.style.transform = "translate(" + cur.x + "px," + cur.y + "px)";
-      cur.el.classList.remove("fx-cur-idle", "fx-cur-away");
-      clearTimeout(cur.idleT);
-      cur.idleT = setTimeout(function() {
-        if (cur.on && cur.el) cur.el.classList.add("fx-cur-idle");
-      }, 2e3);
+      cur.lastMove = performance.now();
+      if (cur.idle) {
+        cur.idle = false;
+        cur.el.classList.remove("fx-cur-idle");
+      }
+      cur.el.classList.remove("fx-cur-away");
     }, {
       passive: true
     });
@@ -495,14 +545,31 @@
         if (Math.abs(state.skew) < .015 && Math.abs(target) < .015) {
           if (state.skew !== 0) {
             state.skew = 0;
+            state.warpOn = false;
             container.style.transform = "";
+            doc.classList.remove("fx-warp");
           }
         } else {
+          if (!state.warpOn) {
+            state.warpOn = true;
+            doc.classList.add("fx-warp");
+          }
           container.style.transform = "skewY(" + state.skew.toFixed(3) + "deg)";
         }
       }
       sbUpdate();
       checkReveals();
+      if (cur.on && cur.el) {
+        if (cur.x !== cur.px || cur.y !== cur.py) {
+          cur.px = cur.x;
+          cur.py = cur.y;
+          cur.el.style.transform = "translate(" + cur.x + "px," + cur.y + "px)";
+        }
+        if (!cur.idle && cur.lastMove && performance.now() - cur.lastMove > 2e3) {
+          cur.idle = true;
+          cur.el.classList.add("fx-cur-idle");
+        }
+      }
     } catch (e) {
       recover();
       return;

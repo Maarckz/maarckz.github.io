@@ -256,8 +256,6 @@
     open: false
   };
   var M = 30;
-  var idleF = 0;
-  var rmMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function clamp(v, a, b) {
     return v < a ? a : v > b ? b : v;
   }
@@ -330,26 +328,36 @@
     if (es < .004) es = 0;
     var sp = Math.hypot(P.svx, P.svy);
     var st = Math.min(sp * .045, .85);
-    var ang = Math.atan2(P.svy, P.svx);
+    var settled = sp < .01 && !P.dragging && P.squash < .01 && Math.abs(P.tx - P.x) < .5 && Math.abs(P.ty - P.y) < .5;
     var sx = (1 + st) * es * (1 - P.squash * .3);
     var sy = Math.max(.35, 1 - st * .6) * es * (1 + P.squash * .38);
-    blob.style.transform = "translate(0,0) rotate(" + ang.toFixed(3) + "rad) scale(" + sx.toFixed(3) + "," + sy.toFixed(3) + ")";
+    var bT = settled
+      ? "translate(0,0) rotate(0rad) scale(" + es.toFixed(3) + "," + Math.max(.35, es).toFixed(3) + ")"
+      : "translate(0,0) rotate(" + Math.atan2(P.svy, P.svx).toFixed(3) + "rad) scale(" + sx.toFixed(3) + "," + sy.toFixed(3) + ")";
+    if (bT !== P._bt) {
+      P._bt = bT;
+      blob.style.transform = bT;
+    }
     var tst = Math.min(tlen * .02, .9);
-    var tang = Math.atan2(tdy, tdx);
     var tsx = (1 + tst) * P.enter;
     var tsy = Math.max(.3, 1 - tst * .55) * P.enter;
-    trail.style.transform = "translate(" + tdx.toFixed(1) + "px," + tdy.toFixed(1) + "px) rotate(" + tang.toFixed(3) + "rad) scale(" + tsx.toFixed(3) + "," + tsy.toFixed(3) + ")";
-    var busy = P.dragging || P.open || P.hoverT === 1 || sp > .35 || Math.abs(P.tx - P.x) + Math.abs(P.ty - P.y) > 2;
-    idleF = busy || rmMotion ? 0 : idleF + 1;
-    var fl = idleF > 150 ? Math.min((idleF - 150) / 120, 1) : 0;
-    var fx = 0, fy = 0;
-    if (fl > 0) {
-      var nowT = performance.now();
-      fx = Math.sin(nowT / 1500) * 4.6 * fl;
-      fy = Math.cos(nowT / 1900) * 3.4 * fl;
+    var tT = settled
+      ? "translate(0,0) rotate(0rad) scale(" + P.enter.toFixed(3) + "," + P.enter.toFixed(3) + ")"
+      : "translate(" + tdx.toFixed(1) + "px," + tdy.toFixed(1) + "px) rotate(" + Math.atan2(tdy, tdx).toFixed(3) + "rad) scale(" + tsx.toFixed(3) + "," + tsy.toFixed(3) + ")";
+    if (tT !== P._tt) {
+      P._tt = tT;
+      trail.style.transform = tT;
     }
-    goo.style.transform = "translate(" + (P.x + fx - 240).toFixed(1) + "px," + (P.y + fy - 240).toFixed(1) + "px)";
-    dotBtn.style.transform = "translate(" + (P.x + fx).toFixed(1) + "px," + (P.y + fy).toFixed(1) + "px)";
+    var gT = "translate(" + (P.x - 240).toFixed(1) + "px," + (P.y - 240).toFixed(1) + "px)";
+    if (gT !== P._gt) {
+      P._gt = gT;
+      goo.style.transform = gT;
+    }
+    var dT = "translate(" + P.x.toFixed(1) + "px," + P.y.toFixed(1) + "px)";
+    if (dT !== P._dt) {
+      P._dt = dT;
+      dotBtn.style.transform = dT;
+    }
     requestAnimationFrame(loop);
   }
   var drag = {
@@ -464,7 +472,7 @@
     goo = document.createElement("div");
     goo.id = "bot-goo";
     goo.setAttribute("aria-hidden", "true");
-    goo.innerHTML = '<div class="bot-trail"></div><div class="bot-blob"></div>';
+    goo.innerHTML = '<div class="bot-float"><div class="bot-trail"></div><div class="bot-blob"></div></div>';
     document.body.appendChild(goo);
     blob = goo.querySelector(".bot-blob");
     trail = goo.querySelector(".bot-trail");
